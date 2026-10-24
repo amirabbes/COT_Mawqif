@@ -1,1 +1,1 @@
-# COT_Mawqif
+# COT_Mawqif_ÉQUIPE_1_2026_2027
