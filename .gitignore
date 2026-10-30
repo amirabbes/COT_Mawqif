@@ -1,4 +1,6 @@
+# Secrets locaux
 .env
+.env.local
 *.log
 
 # Générés par infra/setup-dev.sh (ne jamais pousser)
@@ -9,3 +11,18 @@ infra/mosquitto/passwd
 backend/deployments/*.war
 backend/deployments/*.deployed
 backend/deployments/*.failed
+
+# Frontend (PWA)
+node_modules/
+dist/
+dev-dist/
+
+# Python (simulateur)
+__pycache__/
+.venv/
+
+# Système / éditeurs
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
