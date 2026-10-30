@@ -1,0 +1,110 @@
+# Mawqif - environnement de développement LOCAL
+#
+# Première fois (une seule fois) :
+#   1. cp .env.example .env          (puis changez les mots de passe)
+#   2. bash infra/setup-dev.sh       (certificats TLS + mot de passe MQTT)
+#
+# Ensuite :
+#   docker compose up -d                          # MongoDB + MQTT + WildFly
+#   docker compose --profile gateway up -d        # + Node-RED
+#   docker compose down                           # arrêter
+#   docker compose down -v                        # tout effacer (données comprises)
+
+services:
+
+  # ---------- Base de données ----------
+  # Une seule instance : le backend Jakarta utilise la base "cot_db",
+  # l'exemple Node.js utilise "wot_db".
+  mongodb:
+    image: mongo:7
+    container_name: mawqif-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------- Broker MQTT ----------
+  # Le backend du prof se connecte en TLS 1.3 avec identifiant + mot de passe
+  # (mqtts, port 1882). On reproduit la même chose ici.
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mawqif-mosquitto
+    restart: unless-stopped
+    ports:
+      - "1882:1882"   # MQTT sécurisé (TLS 1.3) : utilisé par le backend
+      - "1883:1883"   # MQTT simple (avec mot de passe) : pour tester en local (Node-RED, simulateur)
+    volumes:
+      - ./infra/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./infra/mosquitto/passwd:/mosquitto/config/passwd:ro
+      - ./infra/certs/ca.crt:/mosquitto/certs/ca.crt:ro
+      - ./infra/certs/server.crt:/mosquitto/certs/server.crt:ro
+      - ./infra/certs/server.key:/mosquitto/certs/server.key:ro
+      - mosquitto_data:/mosquitto/data
+
+  # ---------- Backend : serveur d'applications Jakarta EE 11 ----------
+  # Le projet du prof (cot.zip) est compilé avec Java 25 -> image jdk25.
+  wildfly:
+    image: quay.io/wildfly/wildfly:latest-jdk25
+    container_name: mawqif-wildfly
+    restart: unless-stopped
+    command: ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]
+    environment:
+      # Ces variables remplacent celles du fichier microprofile-config.properties
+      # (MicroProfile Config : "mqtt.broker.url" devient MQTT_BROKER_URL).
+      # Sans elles, le backend ne démarre pas : il lit ces valeurs au lancement.
+      JNOSQL_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongodb:27017/cot_db?authSource=admin&uuidRepresentation=standard&minPoolSize=10&maxPoolSize=120
+      MQTT_BROKER_URL: mqtts://mosquitto:1882
+      MQTT_CLIENT_ID: cot-middleware
+      MQTT_BROKER_USERNAME: ${MQTT_USER}
+      MQTT_BROKER_PASSWORD: ${MQTT_PASSWORD}
+      MQTT_BROKER_TRUSTSTORE_PATH: /opt/certs/truststore.jks
+      MQTT_BROKER_TRUSTSTORE_PASSWORD: ${TRUSTSTORE_PASSWORD}
+    ports:
+      - "8081:8080"   # application et API REST
+      - "9990:9990"   # console d'administration
+    volumes:
+      # Déposer ici le fichier api.war (voir le README) : il est déployé automatiquement
+      - ./backend/deployments:/opt/jboss/wildfly/standalone/deployments
+      - ./infra/certs/truststore.jks:/opt/certs/truststore.jks:ro
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+
+  # ---------- Node-RED (optionnel, côté passerelle) ----------
+  # Node-RED est un outil à part (éditeur visuel de flux), PAS le projet Node.js
+  # du prof. Il sert pour les règles en périphérie (voir cahier des charges).
+  # Dans Node-RED, le noeud MQTT se connecte à :  mosquitto : 1883
+  # avec MQTT_USER / MQTT_PASSWORD.
+  # Lancer avec :  docker compose --profile gateway up -d
+  nodered:
+    image: nodered/node-red:latest
+    container_name: mawqif-nodered
+    restart: unless-stopped
+    profiles: ["gateway"]
+    ports:
+      - "1880:1880"
+    volumes:
+      - nodered_data:/data
+    depends_on:
+      - mosquitto
+
+  # ---------- Plus tard (à ajouter quand on en aura besoin) ----------
+  # keycloak:   authentification OAuth 2.0 / OpenID Connect (semaine 6)
+  # langfuse:   suivi de l'agent IA (semaine 6)
+  # nginx:      TLS 1.3 devant le backend (semaine 6)
+
+volumes:
+  mongo_data:
+  mosquitto_data:
+  nodered_data:

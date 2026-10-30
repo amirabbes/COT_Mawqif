@@ -1,0 +1,11 @@
+.env
+*.log
+
+# Générés par infra/setup-dev.sh (ne jamais pousser)
+infra/certs/
+infra/mosquitto/passwd
+
+# Fichiers compilés
+backend/deployments/*.war
+backend/deployments/*.deployed
+backend/deployments/*.failed
