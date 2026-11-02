@@ -53,7 +53,7 @@ services:
   # ---------- Backend : serveur d'applications Jakarta EE 11 ----------
   # Le projet du prof (cot.zip) est compilé avec Java 25 -> image jdk25.
   wildfly:
-    image: quay.io/wildfly/wildfly:latest-jdk25
+    image: quay.io/wildfly/wildfly:42.0.0.Final-jdk25
     container_name: mawqif-wildfly
     restart: unless-stopped
     command: ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]
