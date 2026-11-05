@@ -84,7 +84,6 @@ Côté sécurité on vise du Zero Trust : DTLS 1.2 pour CoAP, TLS 1.3 pour HTTPS
 | Frontend | 2 PWA |
 | CI/CD | GitHub Actions |
 
-Matériel utilisé : <!-- À COMPLÉTER : modèle du Raspberry Pi, caméras, capteur de distance, barrière -->
 
 ### Messages MQTT
 
