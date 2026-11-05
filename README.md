@@ -85,19 +85,6 @@ Côté sécurité on vise du Zero Trust : DTLS 1.2 pour CoAP, TLS 1.3 pour HTTPS
 | CI/CD | GitHub Actions |
 
 
-### Messages MQTT
-
-Proposition de départ, à valider en semaine 2 :
-
-| Topic | Émetteur | Exemple |
-|---|---|---|
-| `mawqif/{parking}/entree/vehicule` | passerelle | `{"plaque": "123 TUN 4567", "ts": "2026-11-05T09:30:00Z"}` |
-| `mawqif/{parking}/places/{id}` | passerelle | `{"etat": "occupee", "ts": "..."}` |
-| `mawqif/{parking}/barriere/commande` | backend | `{"action": "ouvrir", "signature": "..."}` |
-| `mawqif/{parking}/incidents` | passerelle ou backend | `{"type": "mauvaise_place", "place": 7, "preuve": "..."}` |
-
----
-
 ## Prise en main
 
 ### Organisation du dépôt
