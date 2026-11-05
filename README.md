@@ -104,7 +104,7 @@ docs/        cahier des charges, schémas
 Prérequis : Git, Docker + Docker Compose, Python 3.
 
 ```bash
-git clone <URL_DU_DEPOT>   # À COMPLÉTER
+git clone https://github.com/amirabbes/COT_Mawqif.git 
 cd mawqif
 docker compose up -d       # MongoDB, Mosquitto, Node-RED
 python simulator/simulator.py
