@@ -4,7 +4,11 @@ Plateforme de stationnement intelligent pour le projet Cloud of Things (option A
 Encadrant : Dr. Ing. Mohamed-Bécha Kaâniche.
 Équipe 1 : Amir Abbes, Anas Aouini, Mohamed Kanoun.
 
-## Pourquoi ce projet
+---
+
+## Présentation
+
+### Pourquoi ce projet
 
 En Tunisie il y a de plus en plus de voitures et pas assez de places. Beaucoup de parkings gèrent l'entrée à la main et n'ont aucune donnée fiable sur leur occupation. Mawqif essaie de régler ça : lecture de plaque à l'entrée, barrière commandée automatiquement, suivi des places en temps réel, détection des voitures mal garées, et un assistant pour les automobilistes.
 
@@ -12,7 +16,7 @@ Une règle qu'on s'est fixée dès le départ : l'IA n'ouvre jamais la barrière
 
 Le cahier des charges est dans `docs/`.
 
-## Ce que fait la plateforme
+### Ce que fait la plateforme
 
 Côté exploitant (back-office) :
 - plan d'occupation et flux vidéo annoté
@@ -27,7 +31,7 @@ Côté automobiliste (front-office) :
 
 Les deux interfaces sont des PWA, utilisables hors connexion.
 
-## Déroulement pour un véhicule
+### Déroulement pour un véhicule
 
 1. À l'entrée, la caméra détecte la voiture et la passerelle lit la plaque.
 2. Le backend décide : places restantes, réservation, liste noire.
@@ -53,16 +57,22 @@ sequenceDiagram
     end
 ```
 
-## Architecture
+---
+
+## Conception technique
+
+### Architecture
 
 Quatre couches : objets sur le terrain, passerelle IoT (Raspberry Pi), cloud IaaS, clients PWA.
 
 <!-- À COMPLÉTER : insérer ici votre schéma d'architecture (image dessinée par vous
 dans docs/, ou le diagramme mermaid de l'équipe) -->
 
+### Sécurité
+
 Côté sécurité on vise du Zero Trust : DTLS 1.2 pour CoAP, TLS 1.3 pour HTTPS, mTLS avec certificats X.509, OAuth 2.0 / OIDC via Keycloak, commandes de barrière signées et journal d'audit.
 
-## Technologies
+### Technologies
 
 | Partie | Choix |
 |---|---|
@@ -77,7 +87,7 @@ Côté sécurité on vise du Zero Trust : DTLS 1.2 pour CoAP, TLS 1.3 pour HTTPS
 
 Matériel utilisé : <!-- À COMPLÉTER : modèle du Raspberry Pi, caméras, capteur de distance, barrière -->
 
-## Messages MQTT
+### Messages MQTT
 
 Proposition de départ, à valider en semaine 2 :
 
@@ -88,7 +98,11 @@ Proposition de départ, à valider en semaine 2 :
 | `mawqif/{parking}/barriere/commande` | backend | `{"action": "ouvrir", "signature": "..."}` |
 | `mawqif/{parking}/incidents` | passerelle ou backend | `{"type": "mauvaise_place", "place": 7, "preuve": "..."}` |
 
-## Organisation du dépôt
+---
+
+## Prise en main
+
+### Organisation du dépôt
 
 ```
 gateway/     Node-RED, vision, scripts Raspberry Pi
@@ -100,7 +114,7 @@ infra/       broker, certificats de test, déploiement
 docs/        cahier des charges, schémas
 ```
 
-## Lancer le projet
+### Lancer le projet
 
 Prérequis : Git, Docker + Docker Compose, Python 3.
 
@@ -110,6 +124,8 @@ cd mawqif
 docker compose up -d       # MongoDB, Mosquitto, Node-RED
 python simulator/simulator.py
 ```
+
+---
 
 ## Licence
 
