@@ -80,7 +80,7 @@ Côté sécurité on vise du Zero Trust : DTLS 1.2 pour CoAP, TLS 1.3 pour HTTPS
 | Backend | Jakarta EE 11, WildFly, API REST |
 | Base de données | MongoDB |
 | Sécurité | Keycloak, Nginx (TLS 1.3), mTLS |
-| IA | RAG, LangGraph, Langfuse |
+| LLMOps | RAG, LangGraph, Langfuse |
 | Frontend | 2 PWA |
 | CI/CD | GitHub Actions |
 
