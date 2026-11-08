@@ -103,12 +103,16 @@ docs/        cahier des charges, schémas
 
 Prérequis : Git, Docker + Docker Compose, Python 3.
 
-```bash
+```powershell
 git clone https://github.com/amirabbes/COT_Mawqif.git 
-cd mawqif
-docker compose up -d       # MongoDB, Mosquitto, Node-RED
-python simulator/simulator.py
+cd COT_Mawqif
+docker compose up -d
+docker run --rm -v "${PWD}/backend:/app" -w /app maven:3.9-eclipse-temurin-25 mvn -q clean package
+Copy-Item .\backend\api\target\api.war .\backend\deployments\api.war -Force
+python .\simulator\simulator.py
 ```
+
+Le conteneur Maven ne sert qu'à compiler l'API ; WildFly (démarré par Compose) exécute ensuite le WAR déposé dans `backend\deployments`.
 
 ---
 

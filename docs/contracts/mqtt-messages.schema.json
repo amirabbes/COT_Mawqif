@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/amirabbes/COT_Mawqif/docs/contracts/mqtt-messages.schema.json",
+  "title": "Mawqif — messages MQTT",
+  "description": "Un schéma par type de message. Le topic décide du schéma ; pour `datum`, le champ `event` choisit la variante.",
+  "$defs": {
+    "ts": { "type": "string", "format": "date-time" },
+    "parkingId": { "type": "string", "minLength": 1 },
+    "plate": { "type": "string", "minLength": 3, "maxLength": 20 },
+
+    "status": {
+      "description": "things/<thingId>/status",
+      "type": "object",
+      "required": ["state"],
+      "properties": {
+        "state": { "enum": ["online", "offline"] },
+        "ts": { "$ref": "#/$defs/ts" },
+        "fw": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "datum_vehicle": {
+      "description": "things/<caméra>/datum : voiture vue à l'entrée ou à la sortie",
+      "type": "object",
+      "required": ["event", "parking", "plate", "ts"],
+      "properties": {
+        "event": { "enum": ["vehicle_entered", "vehicle_exited"] },
+        "parking": { "$ref": "#/$defs/parkingId" },
+        "plate": { "$ref": "#/$defs/plate" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "ts": { "$ref": "#/$defs/ts" }
+      },
+      "additionalProperties": false
+    },
+
+    "datum_slot": {
+      "description": "things/place-NN/datum : état d'une place",
+      "type": "object",
+      "required": ["event", "parking", "slot", "state", "ts"],
+      "properties": {
+        "event": { "const": "slot_state" },
+        "parking": { "$ref": "#/$defs/parkingId" },
+        "slot": { "type": "integer", "minimum": 1 },
+        "state": { "enum": ["free", "occupied"] },
+        "plate": { "$ref": "#/$defs/plate" },
+        "ts": { "$ref": "#/$defs/ts" }
+      },
+      "additionalProperties": false
+    },
+
+    "datum_distance": {
+      "description": "things/capteur-distance/datum : mesure brute (optionnel)",
+      "type": "object",
+      "required": ["event", "parking", "distance_cm", "ts"],
+      "properties": {
+        "event": { "const": "distance_reading" },
+        "parking": { "$ref": "#/$defs/parkingId" },
+        "slot": { "type": "integer", "minimum": 1 },
+        "distance_cm": { "type": "number", "minimum": 0 },
+        "ts": { "$ref": "#/$defs/ts" }
+      },
+      "additionalProperties": false
+    },
+
+    "datum_barrier": {
+      "description": "things/barriere/datum : position de la barrière",
+      "type": "object",
+      "required": ["event", "parking", "state", "ts"],
+      "properties": {
+        "event": { "const": "barrier_state" },
+        "parking": { "$ref": "#/$defs/parkingId" },
+        "state": { "enum": ["open", "closed"] },
+        "ts": { "$ref": "#/$defs/ts" }
+      },
+      "additionalProperties": false
+    },
+
+    "datum": {
+      "description": "things/<thingId>/datum",
+      "oneOf": [
+        { "$ref": "#/$defs/datum_vehicle" },
+        { "$ref": "#/$defs/datum_slot" },
+        { "$ref": "#/$defs/datum_distance" },
+        { "$ref": "#/$defs/datum_barrier" }
+      ]
+    },
+
+    "alert_parking_full": {
+      "description": "alerts/<parkingId>/parking_full",
+      "type": "object",
+      "required": ["ts"],
+      "properties": {
+        "plate": { "$ref": "#/$defs/plate" },
+        "message": { "type": "string" },
+        "ts": { "$ref": "#/$defs/ts" }
+      },
+      "additionalProperties": false
+    },
+
+    "alert_wrong_parking": {
+      "description": "alerts/<parkingId>/wrong_parking",
+      "type": "object",
+      "required": ["slot", "plate", "ts"],
+      "properties": {
+        "slot": { "type": "integer", "minimum": 1 },
+        "plate": { "$ref": "#/$defs/plate" },
+        "reason": { "type": "string" },
+        "ts": { "$ref": "#/$defs/ts" }
+      },
+      "additionalProperties": false
+    },
+
+    "alert_plate_refused": {
+      "description": "alerts/<parkingId>/plate_refused (émise par le backend après décision)",
+      "type": "object",
+      "required": ["plate", "ts"],
+      "properties": {
+        "plate": { "$ref": "#/$defs/plate" },
+        "reason": { "enum": ["blacklist", "no_reservation", "parking_full", "unreadable"] },
+        "ts": { "$ref": "#/$defs/ts" }
+      },
+      "additionalProperties": false
+    },
+
+    "alert_thing_offline": {
+      "description": "alerts/<parkingId>/thing_offline",
+      "type": "object",
+      "required": ["thing", "ts"],
+      "properties": {
+        "thing": { "type": "string" },
+        "ts": { "$ref": "#/$defs/ts" }
+      },
+      "additionalProperties": false
+    },
+
+    "cmd": {
+      "description": "things/<barrière>/cmd : backend -> objet. `sig` = base64url(HMAC-SHA256(clé, cmdId|command|parking|issuedAt|expiresAt)).",
+      "type": "object",
+      "required": ["cmdId", "command", "parking", "issuedAt", "expiresAt", "sig"],
+      "properties": {
+        "cmdId": { "type": "string", "minLength": 1 },
+        "command": { "const": "open_barrier" },
+        "parking": { "$ref": "#/$defs/parkingId" },
+        "reason": { "type": "string" },
+        "issuedAt": { "$ref": "#/$defs/ts" },
+        "expiresAt": { "$ref": "#/$defs/ts" },
+        "sig": { "type": "string", "minLength": 20 }
+      },
+      "additionalProperties": false
+    },
+
+    "ack": {
+      "description": "things/<barrière>/ack : objet -> backend",
+      "type": "object",
+      "required": ["cmdId", "result", "ts"],
+      "properties": {
+        "cmdId": { "type": "string", "minLength": 1 },
+        "result": { "enum": ["executed", "rejected"] },
+        "reason": { "type": "string" },
+        "ts": { "$ref": "#/$defs/ts" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

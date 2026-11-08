@@ -70,7 +70,7 @@ services:
       # (MicroProfile Config : "mqtt.broker.url" devient MQTT_BROKER_URL).
       # Sans elles, le backend ne démarre pas : il lit ces valeurs au lancement.
       JNOSQL_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongodb:27017/cot_db?authSource=admin&uuidRepresentation=standard&minPoolSize=10&maxPoolSize=120
-      MQTT_BROKER_URL: mqtts://mosquitto:1882
+      MQTT_BROKER_URL: ssl://mosquitto:1882
       MQTT_CLIENT_ID: cot-middleware
       MQTT_BROKER_USERNAME: ${MQTT_USER}
       MQTT_BROKER_PASSWORD: ${MQTT_PASSWORD}

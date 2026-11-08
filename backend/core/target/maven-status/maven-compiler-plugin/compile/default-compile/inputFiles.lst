@@ -1,0 +1,10 @@
+/app/core/src/main/java/tn/supcom/cot/core/controllers/managers/AbstractCollectionManager.java
+/app/core/src/main/java/tn/supcom/cot/core/controllers/managers/AbstractItemManager.java
+/app/core/src/main/java/tn/supcom/cot/core/controllers/managers/AddressItemManager.java
+/app/core/src/main/java/tn/supcom/cot/core/controllers/repositories/AddressRepository.java
+/app/core/src/main/java/tn/supcom/cot/core/entities/Address.java
+/app/core/src/main/java/tn/supcom/cot/core/entities/NosqlEntity.java
+/app/core/src/main/java/tn/supcom/cot/core/entities/RootEntity.java
+/app/core/src/main/java/tn/supcom/cot/core/entities/UUIDPKEntity.java
+/app/core/src/main/java/tn/supcom/cot/core/utilities/ETagSupport.java
+/app/core/src/main/java/tn/supcom/cot/core/utilities/UUIDv7.java

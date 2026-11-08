@@ -1,0 +1,15 @@
+tn/supcom/cot/core/controllers/managers/AddressItemManager.class
+tn/supcom/cot/core/utilities/UUIDv7.class
+tn/supcom/cot/core/controllers/managers/AbstractCollectionManager.class
+tn/supcom/cot/core/controllers/repositories/AddressRepository_.class
+tn/supcom/cot/core/entities/UUIDPKEntity_.class
+tn/supcom/cot/core/entities/NosqlEntity.class
+tn/supcom/cot/core/entities/_UUIDPKEntity.class
+tn/supcom/cot/core/controllers/repositories/AddressRepository.class
+tn/supcom/cot/core/entities/_Address.class
+tn/supcom/cot/core/utilities/ETagSupport.class
+tn/supcom/cot/core/entities/UUIDPKEntity.class
+tn/supcom/cot/core/entities/Address.class
+tn/supcom/cot/core/entities/RootEntity.class
+tn/supcom/cot/core/entities/Address_.class
+tn/supcom/cot/core/controllers/managers/AbstractItemManager.class
