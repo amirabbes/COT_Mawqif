@@ -84,38 +84,6 @@ Côté sécurité on vise du Zero Trust : DTLS 1.2 pour CoAP, TLS 1.3 pour HTTPS
 | Frontend | 2 PWA |
 | CI/CD | GitHub Actions |
 
-
-## Prise en main
-
-### Organisation du dépôt
-
-```
-gateway/     Node-RED, vision, scripts Raspberry Pi
-backend/     Jakarta EE / WildFly
-frontend/    PWA automobiliste et PWA administrateur
-ai-service/  agent IA, RAG, Langfuse
-simulator/   faux capteurs et fausses caméras
-infra/       broker, certificats de test, déploiement
-docs/        cahier des charges, schémas
-```
-
-### Lancer le projet
-
-Prérequis : Git, Docker + Docker Compose, Python 3.
-
-```powershell
-git clone https://github.com/amirabbes/COT_Mawqif.git 
-cd COT_Mawqif
-docker compose up -d
-docker run --rm -v "${PWD}/backend:/app" -w /app maven:3.9-eclipse-temurin-25 mvn -q clean package
-Copy-Item .\backend\api\target\api.war .\backend\deployments\api.war -Force
-python .\simulator\simulator.py
-```
-
-Le conteneur Maven ne sert qu'à compiler l'API ; WildFly (démarré par Compose) exécute ensuite le WAR déposé dans `backend\deployments`.
-
----
-
 ## Licence
 
 Projet académique COT, SUP'COM 2026/2027.
