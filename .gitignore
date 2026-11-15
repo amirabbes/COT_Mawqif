@@ -27,8 +27,8 @@ Thumbs.db
 .idea/
 .vscode/
 
-__MACOSX
-cot
+/__MACOSX/
+/cot/
 # Archives macOS
 __MACOSX/
 
