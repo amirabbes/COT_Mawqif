@@ -37,4 +37,5 @@ classpath:/root/.m2/repository/org/mongodb/mongodb-driver-sync/5.11.1/mongodb-dr
 classpath:/root/.m2/repository/org/mongodb/bson/5.11.1/bson-5.11.1.jar	531686:1789046886000
 classpath:/root/.m2/repository/org/mongodb/mongodb-driver-core/5.11.1/mongodb-driver-core-5.11.1.jar	1995639:1789046886000
 classpath:/root/.m2/repository/org/eclipse/paho/org.eclipse.paho.mqttv5.client/1.2.5/org.eclipse.paho.mqttv5.client-1.2.5.jar	280760:1594732045000
-classpath:/app/core/target/core-1.0.jar	18122:1794130975492
+classpath:/app/core/target/core-1.0.jar	16218:1794771660309
+classpath:/app/iam/target/iam-1.0.jar	14434:1794771662420

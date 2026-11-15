@@ -50,7 +50,8 @@
         </dependency>
     </dependencies>
     <build>
-        <!-- Nom du WAR = api.war -> contexte /api (docker-compose attend ce nom ; routes REST : /api/v1) -->
-        <finalName>api</finalName>
+        <!-- Nom du WAR = api-1.0.war : le script add-api.cli (consigne de l'enseignant) attend <nom>-<version>.war.
+             Le contexte reste /api grâce à WEB-INF/jboss-web.xml (routes REST : /api/v1). -->
+        <finalName>${project.artifactId}-${project.version}</finalName>
     </build>
 </project>

@@ -26,3 +26,14 @@ __pycache__/
 Thumbs.db
 .idea/
 .vscode/
+
+__MACOSX
+cot
+# Archives macOS
+__MACOSX/
+
+# Sortie de compilation des frontends servis par WildFly (docker-compose.hosts.yml)
+infra/wildfly/www/*
+!infra/wildfly/www/.gitkeep
+
+claude.md

@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Une seule exécution par branche : une nouvelle poussée annule la précédente.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: "Backend (Maven, Java 25, modules core, iam, api)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Compiler et empaqueter (core, iam, api)
+        run: mvn -B -ntp -f backend/pom.xml clean package
+      - name: "Vérifier que les deux WAR sont produits (api-1.0.war et iam-1.0.war, noms attendus par add-api.cli)"
+        run: test -f backend/api/target/api-1.0.war && test -f backend/iam/target/iam-1.0.war
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wars
+          path: |
+            backend/api/target/api-1.0.war
+            backend/iam/target/iam-1.0.war
+          if-no-files-found: error
+          retention-days: 7
+
+  frontend:
+    name: Frontend (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [driver-app, admin-app]
+    defaults:
+      run:
+        working-directory: frontend/${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/${{ matrix.app }}/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-dist
+          path: frontend/${{ matrix.app }}/dist
+          retention-days: 7
+
+  contracts:
+    name: Contrats (OpenAPI + MQTT)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: simulator/requirements.txt
+      - name: Installer les dépendances
+        run: pip install -r simulator/requirements.txt jsonschema openapi-spec-validator pyyaml
+      - name: Valider openapi.yaml
+        run: |
+          python - <<'PY'
+          import yaml
+          from openapi_spec_validator import validate
+          validate(yaml.safe_load(open("docs/contracts/openapi.yaml", encoding="utf-8")))
+          print("openapi.yaml valide")
+          PY
+      - name: Le simulateur respecte le contrat MQTT
+        run: python simulator/check_contract.py --count 500
+
+  wildfly-hosts:
+    name: Scripts .cli de l'enseignant (WildFly)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Appliquer les scripts à un WildFly neuf (dev puis prod), puis une seconde fois pour vérifier l'idempotence
+        run: |
+          for env in dev prod; do
+            docker run --rm -e WF_ENV=$env \
+              -v "$PWD/infra/wildfly:/opt/mawqif-wildfly:ro" \
+              --entrypoint sh quay.io/wildfly/wildfly:42.0.0.Final-jdk25 \
+              -c 'sh /opt/mawqif-wildfly/apply-config.sh && sh /opt/mawqif-wildfly/apply-config.sh'
+          done

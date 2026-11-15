@@ -2,18 +2,21 @@ import { useEffect, useState } from 'react'
 import { api, ApiError } from '../api/client'
 import { connectLive } from '../api/live'
 import type { LiveStatus } from '../api/live'
-import type { Parking } from '../api/types'
+import type { Parking, Slot } from '../api/types'
 
 interface ParkingsState {
   parkings: Parking[]
+  /** Dernière version connue de chaque place reçue en direct, par identifiant. */
+  slotEvents: Record<string, Slot>
   loading: boolean
   error: string | null
   live: LiveStatus
 }
 
-/** Liste des parkings (REST) mise à jour en direct (WebSocket "parking_updated"). */
+/** Liste des parkings (REST) mise à jour en direct (WebSocket "parking_updated" et "slot_updated"). */
 export function useParkings(): ParkingsState {
   const [parkings, setParkings] = useState<Parking[]>([])
+  const [slotEvents, setSlotEvents] = useState<Record<string, Slot>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [live, setLive] = useState<LiveStatus>('connecting')
@@ -36,6 +39,10 @@ export function useParkings(): ParkingsState {
     const stop = connectLive(
       'driver',
       (message) => {
+        if (message.type === 'slot_updated') {
+          const slot = message.data
+          setSlotEvents((current) => ({ ...current, [slot.id]: slot }))
+        }
         if (message.type !== 'parking_updated') return
         const updated = message.data
         setParkings((current) =>
@@ -53,5 +60,5 @@ export function useParkings(): ParkingsState {
     }
   }, [])
 
-  return { parkings, loading, error, live }
+  return { parkings, slotEvents, loading, error, live }
 }

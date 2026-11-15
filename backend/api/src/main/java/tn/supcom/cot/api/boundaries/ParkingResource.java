@@ -19,6 +19,9 @@ import tn.supcom.cot.api.boundaries.Dtos.ParkingDto;
 import tn.supcom.cot.api.boundaries.Dtos.SlotDto;
 import tn.supcom.cot.api.controllers.managers.CommandManager;
 import tn.supcom.cot.api.controllers.managers.ParkingManager;
+import tn.supcom.cot.core.security.Role;
+import tn.supcom.cot.core.security.Secured;
+import tn.supcom.cot.core.security.Scopes;
 
 import java.util.List;
 
@@ -53,6 +56,7 @@ public class ParkingResource {
     /** Ouverture manuelle : réponse 202, le résultat arrive par WebSocket (command_ack). */
     @POST
     @Path("/{parkingId}/barrier/open")
+    @Secured(roles = {Role.OPERATOR, Role.ADMIN}, scopes = Scopes.BARRIER_OPEN)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response openBarrier(@PathParam("parkingId") String parkingId, OpenBarrierRequest request)
             throws MqttException {

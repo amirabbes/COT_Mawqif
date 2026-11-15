@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Mode développement (docker compose seul) : l'application vit sur l'hôte virtuel par défaut, contexte /api.
+  Mode WildFly hôtes virtuels (docker-compose.hosts.yml, scripts .cli de l'enseignant) : API_VIRTUAL_HOST=api-host
+  place l'application sur l'hôte « api-host » (api.<domaine>), où add-api.cli la sert à la racine.
+-->
+<jboss-web>
+    <context-root>/api</context-root>
+    <virtual-host>${env.API_VIRTUAL_HOST:default-host}</virtual-host>
+</jboss-web>

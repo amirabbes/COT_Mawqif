@@ -11,12 +11,16 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import tn.supcom.cot.api.boundaries.Dtos.ThingDto;
 import tn.supcom.cot.api.controllers.managers.ThingManager;
+import tn.supcom.cot.core.security.Role;
+import tn.supcom.cot.core.security.Secured;
+import tn.supcom.cot.core.security.Scopes;
 
 import java.util.List;
 
 @Path("/things")
 @RequestScoped
 @Produces(MediaType.APPLICATION_JSON)
+@Secured(roles = {Role.OPERATOR, Role.ADMIN}, scopes = Scopes.THING_READ)
 public class ThingResource {
 
     @Inject

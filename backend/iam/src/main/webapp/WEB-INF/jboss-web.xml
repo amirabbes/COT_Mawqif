@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Mode développement (docker compose seul) : le service vit sur l'hôte virtuel par défaut, contexte /iam.
+  Mode WildFly hôtes virtuels (docker-compose.hosts.yml, scripts .cli de l'enseignant) : IAM_VIRTUAL_HOST=iam-host
+  place l'application sur l'hôte « iam-host » (iam.<domaine>), où add-api.cli la sert à la racine.
+-->
+<jboss-web>
+    <context-root>/iam</context-root>
+    <virtual-host>${env.IAM_VIRTUAL_HOST:default-host}</virtual-host>
+</jboss-web>

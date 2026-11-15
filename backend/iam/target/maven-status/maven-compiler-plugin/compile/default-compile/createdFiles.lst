@@ -1,0 +1,8 @@
+tn/supcom/cot/iam/security/Scopes.class
+tn/supcom/cot/iam/security/JwtService.class
+tn/supcom/cot/iam/security/Role.class
+tn/supcom/cot/iam/entities/Grant.class
+tn/supcom/cot/iam/entities/Identity.class
+tn/supcom/cot/iam/security/JwtService$Claims.class
+tn/supcom/cot/iam/entities/Tenant.class
+tn/supcom/cot/iam/security/PasswordHasher.class

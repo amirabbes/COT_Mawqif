@@ -1,0 +1,92 @@
+# Mawqif — mode « WildFly sert tout » (consigne de l'enseignant)
+#
+# WildFly sert lui-même les deux frontends (fichiers statiques) et l'API, chacun sur son nom de domaine
+# (hôtes virtuels Undertow), configurés par les scripts infra/wildfly/cli/*.cli de l'enseignant.
+#
+#   www.mawqif.local     -> PWA automobiliste   (default-host)
+#   admin.mawqif.local   -> PWA exploitant      (admin-host)
+#   api.mawqif.local     -> API api-1.0.war     (api-host, à la racine : /v1/..., /ws/...)
+#   iam.mawqif.local     -> IAM iam-1.0.war     (iam-host, à la racine : /v1/auth/token, /v1/identities...)
+#
+# Lancer (à la place du mode développement) :
+#   docker compose -f docker-compose.yml -f docker-compose.hosts.yml up -d
+# Arrêter :
+#   docker compose -f docker-compose.yml -f docker-compose.hosts.yml down
+# Pour revenir au mode développement : docker compose up -d   (sans le second fichier)
+#
+# Chaque ordinateur qui ouvre les sites doit associer les 4 noms à l'adresse du serveur
+# (fichier hosts : C:\Windows\System32\drivers\etc\hosts), par exemple :
+#   127.0.0.1   www.mawqif.local admin.mawqif.local api.mawqif.local iam.mawqif.local
+# Ensuite : http://www.mawqif.local:8081  et  http://admin.mawqif.local:8081
+#
+# Pour un vrai domaine (prod) : WF_ENV=prod et les fichiers infra/wildfly/*-prod.properties,
+# avec HTTPS (les scripts redirigent le port 80 vers HTTPS et n'ajoutent le CORS qu'aux origines https).
+
+services:
+
+  # ---------- Compilation des deux frontends (npm run build) ----------
+  # Le résultat est écrit dans infra/wildfly/www/{root,admin}, que WildFly sert.
+  frontend-builder:
+    image: node:22
+    container_name: mawqif-frontend-builder
+    working_dir: /build
+    environment:
+      # L'API a son propre hôte : pas de préfixe /api (voir frontend/*/src/api/client.ts).
+      # HOSTS_API_URL (et non VITE_API_URL, déjà utilisé par le mode développement dans .env)
+      VITE_API_URL: ${HOSTS_API_URL:-http://api.mawqif.local:8081}
+      VITE_API_PREFIX: ""
+      # Même chose pour le service d'identité (iam-1.0.war) : son propre hôte, pas de préfixe /iam.
+      VITE_IAM_URL: ${HOSTS_IAM_URL:-http://iam.mawqif.local:8081}
+      VITE_IAM_PREFIX: ""
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        tar -C /src --exclude=node_modules --exclude=dist -cf - . | tar -C /build -xf -
+        for app in driver-app admin-app; do
+          (cd /build/$$app && npm ci --no-audit --no-fund && npm run build)
+        done
+        rm -rf /out/root /out/admin
+        mkdir -p /out/root /out/admin
+        cp -r /build/driver-app/dist/. /out/root/
+        cp -r /build/admin-app/dist/. /out/admin/
+    volumes:
+      - ./frontend:/src:ro
+      - ./infra/wildfly/www:/out
+      - npm_cache:/root/.npm
+
+  # ---------- Application des scripts .cli de l'enseignant ----------
+  # Modifie standalone.xml (gardé dans le volume wildfly_conf) AVANT le démarrage de WildFly. Idempotent.
+  wildfly-config:
+    image: quay.io/wildfly/wildfly:42.0.0.Final-jdk25
+    container_name: mawqif-wildfly-config
+    entrypoint: ["sh", "/opt/mawqif-wildfly/apply-config.sh"]
+    environment:
+      WF_ENV: ${WF_ENV:-dev}
+    volumes:
+      - wildfly_conf:/opt/jboss/wildfly/standalone/configuration
+      - ./infra/wildfly:/opt/mawqif-wildfly:ro
+
+  wildfly:
+    environment:
+      # Place l'application sur l'hôte virtuel « api-host » (voir backend/api/src/main/webapp/WEB-INF/jboss-web.xml).
+      API_VIRTUAL_HOST: api-host
+      # Idem pour le service d'identité (voir backend/iam/src/main/webapp/WEB-INF/jboss-web.xml).
+      IAM_VIRTUAL_HOST: iam-host
+      # Sans HTTPS (développement), les en-têtes CORS de WildFly ne s'appliquent pas : notre filtre reste actif
+      # avec les origines exactes. En HTTPS (prod) : CORS_ENABLED=false pour ne pas doubler les en-têtes.
+      CORS_ENABLED: ${CORS_ENABLED:-true}
+      CORS_ALLOWED_ORIGINS: ${HOSTS_CORS_ORIGINS:-http://www.mawqif.local:8081,http://admin.mawqif.local:8081}
+    volumes:
+      - wildfly_conf:/opt/jboss/wildfly/standalone/configuration
+      - ./infra/wildfly/www:/var/opt/wildfly/www:ro
+    depends_on:
+      wildfly-config:
+        condition: service_completed_successfully
+      frontend-builder:
+        condition: service_completed_successfully
+
+volumes:
+  wildfly_conf:
+  npm_cache:

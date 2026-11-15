@@ -27,7 +27,8 @@ Chaque message est une enveloppe JSON :
 | `alert_created` | `Alert` | `admin` |
 | `command_ack` | `Command` | `admin` |
 
-L'authentification du WebSocket (jeton Keycloak) sera ajoutée avec la sécurité (semaine 6).
+Authentification : la vue `driver` est publique ; la vue `admin` exige un jeton d'accès émis par le service IAM, passé en paramètre
+(`ws://.../ws/admin?access_token=<jwt>`), rôle OPERATOR ou ADMIN.
 
 ## Correspondance MQTT → REST/WebSocket
 

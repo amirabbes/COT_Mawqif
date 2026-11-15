@@ -1,0 +1,7 @@
+/app/iam/src/main/java/tn/supcom/cot/iam/entities/Grant.java
+/app/iam/src/main/java/tn/supcom/cot/iam/entities/Identity.java
+/app/iam/src/main/java/tn/supcom/cot/iam/entities/Tenant.java
+/app/iam/src/main/java/tn/supcom/cot/iam/security/JwtService.java
+/app/iam/src/main/java/tn/supcom/cot/iam/security/PasswordHasher.java
+/app/iam/src/main/java/tn/supcom/cot/iam/security/Role.java
+/app/iam/src/main/java/tn/supcom/cot/iam/security/Scopes.java

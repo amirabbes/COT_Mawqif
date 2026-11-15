@@ -1,30 +1,42 @@
+import { AuthPanel } from './components/AuthPanel'
+import { ParkingCard } from './components/ParkingCard'
+import { ReservationForm } from './components/ReservationForm'
 import { useParkings } from './hooks/useParkings'
+import { useSession } from './hooks/useSession'
+
+const LIVE_LABEL = { open: 'temps réel actif', connecting: 'connexion…', closed: 'temps réel coupé' } as const
 
 export default function App() {
-  const { parkings, loading, error, live } = useParkings()
+  const { parkings, slotEvents, loading, error, live } = useParkings()
+  const { session, me } = useSession()
 
   return (
-    <main style={{ fontFamily: 'sans-serif', padding: 24 }}>
-      <h1>Mawqif · Automobiliste</h1>
-      <p style={{ color: '#666' }}>
-        Temps réel : {live === 'open' ? 'connecté' : live === 'connecting' ? 'connexion…' : 'déconnecté'}
-      </p>
+    <>
+      <header className="topbar">
+        <h1>Mawqif · Automobiliste</h1>
+        <span>
+          <span className={`dot ${live === 'open' ? 'open' : live === 'closed' ? 'closed' : ''}`} />
+          {LIVE_LABEL[live]}
+        </span>
+      </header>
 
-      {loading && <p>Chargement des parkings…</p>}
-      {error && <p style={{ color: 'crimson' }}>Erreur : {error}</p>}
-      {!loading && !error && parkings.length === 0 && <p>Aucun parking pour le moment.</p>}
+      <main className="container">
+        <AuthPanel me={me} loggedIn={session !== null} />
 
-      <ul style={{ listStyle: 'none', padding: 0, display: 'grid', gap: 12, maxWidth: 480 }}>
-        {parkings.map((p) => (
-          <li key={p.id} style={{ border: '1px solid #ddd', borderRadius: 8, padding: 12 }}>
-            <strong>{p.name}</strong>
-            <div>
-              {p.freeSlots} place{p.freeSlots > 1 ? 's' : ''} libre{p.freeSlots > 1 ? 's' : ''} sur {p.totalSlots}
-            </div>
-            <small style={{ color: '#666' }}>Barrière : {p.barrierState}</small>
-          </li>
-        ))}
-      </ul>
-    </main>
+        <section className="panel">
+          <h2>Parkings</h2>
+          {loading && <div className="muted">Chargement des parkings…</div>}
+          {error && <div className="msg error">{error}</div>}
+          {!loading && !error && parkings.length === 0 && <div className="muted">Aucun parking pour le moment.</div>}
+          <div className="grid">
+            {parkings.map((p) => (
+              <ParkingCard key={p.id} parking={p} slotEvents={slotEvents} />
+            ))}
+          </div>
+        </section>
+
+        <ReservationForm parkings={parkings} loggedIn={session !== null} />
+      </main>
+    </>
   )
 }

@@ -81,10 +81,10 @@ public class AddressRepository_ implements AddressRepository {
 	}
 	
 	@Override
-	public  <S extends Address> S insert(@Nonnull S entity) {
-		requireNonNull(entity, "Null entity");
+	public  <S extends Address> S insert(@Nonnull S arg0) {
+		requireNonNull(arg0, "Null arg0");
 		try {
-			session.insert(entity);
+			session.insert(arg0);
 		}
 		catch (ConstraintViolationException _ex) {
 			throw new EntityExistsException(_ex.getMessage(), _ex);
@@ -92,14 +92,14 @@ public class AddressRepository_ implements AddressRepository {
 		catch (PersistenceException _ex) {
 			throw new DataException(_ex.getMessage(), _ex);
 		}
-		return entity;
+		return arg0;
 	}
 	
 	@Override
-	public  <S extends Address> List<S> insertAll(@Nonnull List<S> entities) {
-		requireNonNull(entities, "Null entities");
+	public  <S extends Address> List<S> insertAll(@Nonnull List<S> arg0) {
+		requireNonNull(arg0, "Null arg0");
 		try {
-			session.insertMultiple(entities);
+			session.insertMultiple(arg0);
 		}
 		catch (ConstraintViolationException _ex) {
 			throw new EntityExistsException(_ex.getMessage(), _ex);
@@ -107,14 +107,14 @@ public class AddressRepository_ implements AddressRepository {
 		catch (PersistenceException _ex) {
 			throw new DataException(_ex.getMessage(), _ex);
 		}
-		return entities;
+		return arg0;
 	}
 	
 	@Override
-	public  <S extends Address> S update(@Nonnull S entity) {
-		requireNonNull(entity, "Null entity");
+	public  <S extends Address> S update(@Nonnull S arg0) {
+		requireNonNull(arg0, "Null arg0");
 		try {
-			session.update(entity);
+			session.update(arg0);
 		}
 		catch (StaleStateException _ex) {
 			throw new OptimisticLockingFailureException(_ex.getMessage(), _ex);
@@ -122,14 +122,14 @@ public class AddressRepository_ implements AddressRepository {
 		catch (PersistenceException _ex) {
 			throw new DataException(_ex.getMessage(), _ex);
 		}
-		return entity;
+		return arg0;
 	}
 	
 	@Override
-	public  <S extends Address> List<S> updateAll(@Nonnull List<S> entities) {
-		requireNonNull(entities, "Null entities");
+	public  <S extends Address> List<S> updateAll(@Nonnull List<S> arg0) {
+		requireNonNull(arg0, "Null arg0");
 		try {
-			session.updateMultiple(entities);
+			session.updateMultiple(arg0);
 		}
 		catch (StaleStateException _ex) {
 			throw new OptimisticLockingFailureException(_ex.getMessage(), _ex);
@@ -137,14 +137,14 @@ public class AddressRepository_ implements AddressRepository {
 		catch (PersistenceException _ex) {
 			throw new DataException(_ex.getMessage(), _ex);
 		}
-		return entities;
+		return arg0;
 	}
 	
 	@Override
-	public  <S extends Address> S save(@Nonnull S entity) {
-		requireNonNull(entity, "Null entity");
+	public  <S extends Address> S save(@Nonnull S arg0) {
+		requireNonNull(arg0, "Null arg0");
 		try {
-			session.upsert(entity);
+			session.upsert(arg0);
 		}
 		catch (StaleStateException _ex) {
 			throw new OptimisticLockingFailureException(_ex.getMessage(), _ex);
@@ -152,14 +152,14 @@ public class AddressRepository_ implements AddressRepository {
 		catch (PersistenceException _ex) {
 			throw new DataException(_ex.getMessage(), _ex);
 		}
-		return entity;
+		return arg0;
 	}
 	
 	@Override
-	public  <S extends Address> List<S> saveAll(@Nonnull List<S> entities) {
-		requireNonNull(entities, "Null entities");
+	public  <S extends Address> List<S> saveAll(@Nonnull List<S> arg0) {
+		requireNonNull(arg0, "Null arg0");
 		try {
-			session.upsertMultiple(entities);
+			session.upsertMultiple(arg0);
 		}
 		catch (StaleStateException _ex) {
 			throw new OptimisticLockingFailureException(_ex.getMessage(), _ex);
@@ -167,14 +167,14 @@ public class AddressRepository_ implements AddressRepository {
 		catch (PersistenceException _ex) {
 			throw new DataException(_ex.getMessage(), _ex);
 		}
-		return entities;
+		return arg0;
 	}
 	
 	@Override
-	public void delete(@Nonnull Address entity) {
-		requireNonNull(entity, "Null entity");
+	public void delete(@Nonnull Address arg0) {
+		requireNonNull(arg0, "Null arg0");
 		try {
-			session.delete(entity);
+			session.delete(arg0);
 		}
 		catch (StaleStateException _ex) {
 			throw new OptimisticLockingFailureException(_ex.getMessage(), _ex);
@@ -185,10 +185,10 @@ public class AddressRepository_ implements AddressRepository {
 	}
 	
 	@Override
-	public void deleteAll(@Nonnull List<? extends Address> entities) {
-		requireNonNull(entities, "Null entities");
+	public void deleteAll(@Nonnull List<? extends Address> arg0) {
+		requireNonNull(arg0, "Null arg0");
 		try {
-			session.deleteMultiple(entities);
+			session.deleteMultiple(arg0);
 		}
 		catch (StaleStateException _ex) {
 			throw new OptimisticLockingFailureException(_ex.getMessage(), _ex);
@@ -278,16 +278,16 @@ public class AddressRepository_ implements AddressRepository {
 	 * @see tn.supcom.cot.core.controllers.repositories.AddressRepository#findAll(PageRequest,Order)
 	 **/
 	@Override
-	public Page<Address> findAll(@Nonnull PageRequest pageRequest, @Nonnull Order<Address> sortBy) {
-		requireNonNull(pageRequest, "Null pageRequest");
-		requireNonNull(sortBy, "Null sortBy");
+	public Page<Address> findAll(@Nonnull PageRequest arg0, @Nonnull Order<Address> arg1) {
+		requireNonNull(arg0, "Null arg0");
+		requireNonNull(arg1, "Null arg1");
 		var _builder = session.getCriteriaBuilder();
 		var _query = _builder.createQuery(Address.class);
 		var _entity = _query.from(Address.class);
 		_query.where(
 		);
 		var _spec = SelectionSpecification.create(_query);
-		for (var _sort : sortBy.sorts()) {
+		for (var _sort : arg1.sorts()) {
 			_spec.sort(asc(Address.class, _sort.property())
 						.reversedIf(_sort.isDescending())
 						.ignoringCaseIf(_sort.ignoreCase()));
@@ -295,15 +295,15 @@ public class AddressRepository_ implements AddressRepository {
 		try {
 			var _select = _spec.createQuery(session);
 			long _totalResults = 
-					pageRequest.requestTotal()
+					arg0.requestTotal()
 							? _select
 									.getResultCount()
 							: -1;
 			var _results = _select
-				.setFirstResult((int) (pageRequest.page()-1) * pageRequest.size())
-				.setMaxResults(pageRequest.size())
+				.setFirstResult((int) (arg0.page()-1) * arg0.size())
+				.setMaxResults(arg0.size())
 				.getResultList();
-			return new PageRecord<>(pageRequest, _results, _totalResults);
+			return new PageRecord<>(arg0, _results, _totalResults);
 		}
 		catch (PersistenceException _ex) {
 			throw new DataException(_ex.getMessage(), _ex);

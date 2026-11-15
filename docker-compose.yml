@@ -5,7 +5,8 @@
 #   2. bash infra/setup-dev.sh       (certificats TLS)
 #
 # Ensuite :
-#   docker compose up -d                          # MongoDB + MQTT + WildFly
+#   docker compose up -d                          # compile l'API, puis MongoDB + MQTT + WildFly (mode développement)
+#   docker compose -f docker-compose.yml -f docker-compose.hosts.yml up -d   # mode « WildFly sert tout » (scripts .cli de l'enseignant)
 #   docker compose --profile gateway up -d        # + Node-RED
 #   docker compose down                           # arrêter
 #   docker compose down -v                        # tout effacer (données comprises)
@@ -58,6 +59,24 @@ services:
       - ./infra/certs/server.key:/mosquitto/certs/server.key:ro
       - mosquitto_data:/mosquitto/data
 
+  # ---------- Compilation du backend (une seule fois à chaque "docker compose up") ----------
+  # Remplace les deux commandes manuelles : mvn clean package, puis copie de api-1.0.war et iam-1.0.war dans backend/deployments.
+  # Le cache Maven est gardé dans un volume : seul le premier lancement est long (téléchargements).
+  api-builder:
+    image: maven:3.9-eclipse-temurin-25
+    container_name: mawqif-api-builder
+    working_dir: /build
+    # On compile une COPIE des sources : jamais de "mvn clean" sur le dossier Windows (verrous OneDrive/Windows),
+    # et les dossiers target/ de votre dépôt ne sont plus modifiés.
+    command:
+      - sh
+      - -c
+      - cp -r /src/. /build/ && rm -rf /build/core/target /build/iam/target /build/api/target && mvn -q -B clean package && mkdir -p /deployments && rm -f /deployments/api.war /deployments/api.war.* && cp api/target/api-1.0.war iam/target/iam-1.0.war /deployments/
+    volumes:
+      - ./backend:/src:ro
+      - ./backend/deployments:/deployments
+      - maven_cache:/root/.m2
+
   # ---------- Backend : serveur d'applications Jakarta EE 11 ----------
   # Le projet du prof (cot.zip) est compilé avec Java 25 -> image jdk25.
   wildfly:
@@ -76,11 +95,19 @@ services:
       MQTT_BROKER_PASSWORD: ${MQTT_PASSWORD}
       MQTT_BROKER_TRUSTSTORE_PATH: /opt/certs/truststore.jks
       MQTT_BROKER_TRUSTSTORE_PASSWORD: ${TRUSTSTORE_PASSWORD}
+      # IAM : clé de signature des JWT (32 caractères ou plus) et mots de passe des comptes de test.
+      IAM_JWT_SECRET: ${IAM_JWT_SECRET:-dev-only-change-me-iam-secret-0123456789}
+      IAM_SEED_ADMIN_PASSWORD: ${IAM_SEED_ADMIN_PASSWORD:-admin12345}
+      IAM_SEED_OPERATOR_PASSWORD: ${IAM_SEED_OPERATOR_PASSWORD:-operator12345}
+      IAM_SEED_DRIVER_PASSWORD: ${IAM_SEED_DRIVER_PASSWORD:-driver12345}
+      # Origines autorisées pour les PWA. '*' = toutes (pratique sur un réseau local de développement).
+      # Hors développement : liste exacte, ex. http://192.168.1.20:5173,http://192.168.1.20:5174
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-*}
     ports:
       - "8081:8080"   # application et API REST
       - "9990:9990"   # console d'administration
     volumes:
-      # Déposer ici le fichier api.war (voir le README) : il est déployé automatiquement
+      # api-1.0.war et iam-1.0.war y sont déposés par le service api-builder : il est déployé automatiquement
       - ./backend/deployments:/opt/jboss/wildfly/standalone/deployments
       - ./infra/certs/truststore.jks:/opt/certs/truststore.jks:ro
     depends_on:
@@ -88,6 +115,8 @@ services:
         condition: service_healthy
       mosquitto:
         condition: service_started
+      api-builder:
+        condition: service_completed_successfully
 
   # ---------- Node-RED (optionnel, côté passerelle) ----------
   # Node-RED est un outil à part (éditeur visuel de flux), PAS le projet Node.js
@@ -113,6 +142,7 @@ services:
   # nginx:      TLS 1.3 devant le backend (semaine 6)
 
 volumes:
+  maven_cache:
   mongo_data:
   mosquitto_data:
   nodered_data:

@@ -10,9 +10,18 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** Autorise les PWA (Vite : 5173 et 5174) à appeler l'API en local. Liste modifiable : cors.allowed.origins. */
+/**
+ * Autorise les PWA à appeler l'API. Liste modifiable : cors.allowed.origins (variable CORS_ALLOWED_ORIGINS).
+ * "*" autorise toute origine : acceptable en réseau local de développement car l'API utilise des jetons Bearer
+ * (pas de cookies) ; à remplacer par la liste exacte hors développement.
+ * cors.enabled=false (variable CORS_ENABLED) désactive ce filtre quand WildFly ajoute déjà les en-têtes CORS
+ * (scripts .cli de l'enseignant en HTTPS) : sinon l'en-tête serait en double et les navigateurs le refuseraient.
+ */
 @Provider
 public class CorsFilter implements ContainerResponseFilter {
+
+    private final boolean enabled = ConfigProvider.getConfig()
+            .getOptionalValue("cors.enabled", Boolean.class).orElse(true);
 
     private final Set<String> allowed = Arrays.stream(
                     ConfigProvider.getConfig()
@@ -24,8 +33,9 @@ public class CorsFilter implements ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) {
+        if (!enabled) return;
         var origin = request.getHeaderString("Origin");
-        if (origin == null || !allowed.contains(origin)) return;
+        if (origin == null || !(allowed.contains("*") || allowed.contains(origin))) return;
         var h = response.getHeaders();
         h.putSingle("Access-Control-Allow-Origin", origin);
         h.putSingle("Vary", "Origin");

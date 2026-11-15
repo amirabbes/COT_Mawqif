@@ -67,6 +67,8 @@ export interface Reservation {
   from: string
   to: string
   status: 'active' | 'used' | 'cancelled' | 'expired'
+  /** Nom du compte qui a réservé. */
+  owner?: string
 }
 
 export interface CreateReservationRequest {
@@ -74,6 +76,35 @@ export interface CreateReservationRequest {
   plate: string
   from: string
   to: string
+}
+
+// ---------- Authentification (voir docs/contracts/openapi.yaml, tag auth) ----------
+
+export type Role = 'DRIVER' | 'OPERATOR' | 'ADMIN'
+
+export interface TokenResponse {
+  access_token: string
+  token_type: 'Bearer'
+  expires_in: number
+  refresh_token: string
+  scope: string
+}
+
+export interface Identity {
+  id: string
+  username: string
+  roles: Role[]
+  scope?: string
+  createdAt?: string
+}
+
+export interface Me {
+  id: string
+  username: string
+  roles: Role[]
+  scope: string
+  client_id: string
+  expires_at: string
 }
 
 /** Erreur application/problem+json (RFC 9457). */

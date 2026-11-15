@@ -12,12 +12,16 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import tn.supcom.cot.api.boundaries.Dtos.AlertDto;
 import tn.supcom.cot.api.controllers.managers.AlertManager;
+import tn.supcom.cot.core.security.Role;
+import tn.supcom.cot.core.security.Secured;
+import tn.supcom.cot.core.security.Scopes;
 
 import java.util.List;
 
 @Path("/alerts")
 @RequestScoped
 @Produces(MediaType.APPLICATION_JSON)
+@Secured(roles = {Role.OPERATOR, Role.ADMIN}, scopes = Scopes.ALERT_MANAGE)
 public class AlertResource {
 
     @Inject
