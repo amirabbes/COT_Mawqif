@@ -87,17 +87,6 @@ Côté sécurité on vise du Zero Trust : DTLS 1.2 pour CoAP, TLS 1.3 pour HTTPS
 
 ## Prise en main
 
-### Organisation du dépôt
-
-```
-gateway/     Node-RED, vision, scripts Raspberry Pi
-backend/     Jakarta EE / WildFly : core (commun), iam (WAR identités), api (WAR métier)
-frontend/    PWA automobiliste et PWA administrateur
-ai-service/  agent IA, RAG, Langfuse
-simulator/   faux capteurs et fausses caméras
-infra/       broker, certificats de test, déploiement
-docs/        cahier des charges, schémas
-```
 
 ### Lancer le projet
 
