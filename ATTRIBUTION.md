@@ -21,9 +21,9 @@ Ce document est un livrable obligatoire devant être complété et mis à jour �
 
 *Cochez l'option qui correspond à votre réalité et détaillez le périmètre.*
 
-* [ ] **Option A :** Aucun outil de génération de code par IA n'a été utilisé.
-* [x] **Option B :** Utilisation modérée (Aide au débogage, génération de fonctions isolées, documentation, génération de snippets, aide à la structure du projet).
-* [ ] **Option C :** Utilisation intensive (Génération de structures de dossiers, squelettes d'API complets, scripts de déploiement).
+* [] **Option A :** Aucun outil de génération de code par IA n'a été utilisé.
+* [] **Option B :** Utilisation modérée (Aide au débogage, génération de fonctions isolées, documentation, génération de snippets, aide à la structure du projet).
+* [x] **Option C :** Utilisation intensive (Génération de structures de dossiers, squelettes d'API complets, scripts de déploiement).
 
 ### 📝 Journal des invites (Prompts) notables et composants générés par IA :
 
