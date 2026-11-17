@@ -60,7 +60,7 @@ Ce document est un livrable obligatoire devant être complété et mis à jour �
 | :--- | ---: | ---: | ---: |
 | **Passerelle IoT / Node-RED / Edge** | 15 % | 85 % | 0 % |
 | **Backend / API REST / Middleware** | 15 % | 85 % | 0 % |
-| **Sécurité (IAM / Keycloak / mTLS)** |  % |  % |  % |
+| **Sécurité (IAM / Keycloak / mTLS)** | 15 % | 85 % | 0 % |
 | **Frontend / PWA** | 15 % | 85 % | 0 % |
 | **Scripts d'Infra / Déploiement** | 15 % | 85 % | 0 % |
 | **Simulateur / Données / Scénarios** | 15 % | 85 % | 0 % |
@@ -73,7 +73,7 @@ Ce document est un livrable obligatoire devant être complété et mis à jour �
 En validant ce fichier sur notre dépôt GitHub, nous certifions sur l'honneur que les déclarations ci-dessus sont exactes, sincères et reflètent fidèlement notre processus de développement. Nous sommes conscients que la falsification de ce document ou la non-maîtrise technique du code déclaré comme "écrit par l'équipe" lors des soutenances entraînera une pénalité immédiate et sévère sur la note globale.
 
 *   [x] **Lu et approuvé par l'ensemble des membres de l'équipe.**
-*   **Date de dernière mise à jour :** 10 / 11 / 2026
+*   **Date de dernière mise à jour :** 16 / 11 / 2026
 
 ---
 
