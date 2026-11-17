@@ -33,7 +33,7 @@ Ce document est un livrable obligatoire devant être complété et mis à jour �
 | Analyse de la structure du dépôt et de l'architecture | GitHub Copilot / IA assistante | Aide à l'organisation du dépôt, identification des modules backend/frontend/infrastructure, et aide à la documentation technique. |
 | Débogage et validation des scripts / config | GitHub Copilot / IA assistante | Assistance sur les erreurs de configuration, scripts Docker, scripts de test, aide à la correction de petits bugs. |
 |
-|  |  |  |
+
 
 
 ---
